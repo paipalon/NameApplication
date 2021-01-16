@@ -1,0 +1,155 @@
+<HTML>
+<HEAD>
+<TITLE>NIMITIEDOT</TITLE>
+<meta charset='utf-8'>
+<script src="modernizr.min.js"></script>
+ <script>
+ 
+ function lisavali(nimenpituus)
+ //Määrittelee nimen ja määrän välin nimen pituuden mukaan
+ {
+	var lv = " ";
+	var lisamaara = (20-nimenpituus);
+	for(i=0; i<lisamaara; i++)
+	{
+		lv += " ";
+	}
+	return lv;
+ }
+ 
+ function maarajarjestys()
+ {
+	//alert("Haetaan nimet suositummuusjärjestyksessä");
+	var i = 0;
+	var j;
+	var teksti = " ";
+	teksti += ("Nimi                       Määrä "+'\n');
+	teksti += ("--------------------------------------------------"+'\n'+'\n');
+	var sj = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+	nimet = JSON.parse(localStorage.getItem("nimet"));
+	//alert("Haettiin nimirivit");
+	for (nimi in nimet) 
+	{
+		nr = nimet[nimi];
+		sj[i] = Number(nr.maara);
+		i++;
+	}
+	//alert("Nimien määrät lisättiin taulukkoon");
+	sj.sort(function(a, b){return b-a});
+	sj = [...new Set (sj)];
+	//alert("Taulukko lajiteltiin määrän mukaan");
+	for(j=0;j<20;j++)
+	{
+		//alert("Etsitään tiedot numerolle "+sj[j]);
+		for (nimi in nimet)
+		{
+			nr = nimet[nimi];
+			if (nr.maara == sj[j])
+			{
+				//alert("Löytyi rivi numerolle "+sj[j]);
+				teksti += (nr.nimi);
+				teksti += "          ";
+				teksti += lisavali(nr.nimi.length);
+				teksti += (nr.maara+'\n');
+			}
+				
+		}
+	}
+	document.lomake.nimet.value = teksti;
+ }
+ 
+ function aakkosjarjestys()
+ {
+	//alert("Haetaan nimet aakkosjärjestyksessä");
+	var i = 0;
+	var j;
+	var teksti = " ";
+	teksti += ("Nimi"+'\n');
+	teksti += ("----------------"+'\n'+'\n');
+	var aj = [" "," "," "," "," "," "," "," "," "," ",
+			 " "," "," "," "," "," "," "," "," "," "];
+	nimet = JSON.parse(localStorage.getItem("nimet"));
+	for (nimi in nimet) 
+	{
+		nr = nimet[nimi];
+		aj[i] = nr.nimi;
+		i++;
+	}
+	//alert("Nimet lisättiin taulukkoon");
+	aj.sort();
+	//alert("Nimet aakkostettiin");
+	for(j=0;j<20;j++)
+	{
+		//alert("Etsitään tiedot nimelle "+aj[j]);
+		for (nimi in nimet)
+		{
+			nr = nimet[nimi];
+			if (nr.nimi == aj[j])
+			{
+				//alert("Löytyi rivi nimelle "+aj[j]);
+				//teksti += (nr.nimi+"                   "+nr.maara+'\n');
+				teksti += (nr.nimi+'\n');
+			}
+				
+		}
+	}
+	//alert("Rivit on etsitty");
+	document.lomake.nimet.value = teksti;
+ }
+ 
+ function etsi_maara()
+ {
+	var nimisyote = document.lomake.nimiparam.value;
+	var loytyi = false;
+	//alert("Etsitään nimen "+nimisyote+" määrä");
+	nimet = JSON.parse(localStorage.getItem("nimet"));
+	for (nimi in nimet) 
+	{
+		nr = nimet[nimi];
+		if (nr.nimi == nimisyote)
+		{
+			loytyi = true;
+			nmtulos = (nimisyote+" nimisiä on "+nr.maara+".");
+		}
+	}
+	if(loytyi)
+		document.lomake.nm.value = nmtulos;
+	else	document.lomake.nm.value = "Tätä nimeä ei löytynyt.";
+ }
+ 
+ function yhteismaara()
+ {
+	//alert("Lasketaan nimien yhteismäärä");
+	var tulos = " ";
+	nimet = JSON.parse(localStorage.getItem("nimet"));
+	var kokmaara=0;
+	var lisays=0;
+	for (nimi in nimet) 
+	{
+		nr = nimet[nimi];
+		lisays = (Number(nr.maara));
+		//alert("Lisäys on "+lisays);
+		kokmaara += lisays;
+		//alert("Kokonaismäärä on "+kokmaara+".");
+	}
+	//alert("Nimiä on kaikkiaan "+kokmaara);
+	tulos = ("Nimiä on kaikkiaan "+kokmaara+".");
+	document.lomake.ym.value = tulos;
+ }
+ 
+ </script>
+</HEAD>
+<BODY>
+<FORM name="lomake" onSubmit="return false" style="color:fuchsia">
+  <H2> TYÖNTEKIJÖIDEN NIMITIETOJEN HAKU </H2>
+  Nimet suositummuusjärjestyksessä <button onclick="maarajarjestys()">Hae</button> 
+  Nimet aakkosjärjestyksessä <button onclick="aakkosjarjestys()">Hae</button> <br><br>
+  Nimen <input type="text" name="nimiparam"> määrä <button onclick="etsi_maara()">Hae</button> <input readonly type="text" name="nm"> <br><br>
+  Kaikkien nimien yhteismäärä <button onclick="yhteismaara()">Hae</button> <input readonly type="text" name="ym"> <br><br>
+  
+  <textarea name="nimet" rows="25" cols="60"></textarea>
+  
+  
+ </FORM>
+</BODY>
+</HTML>
